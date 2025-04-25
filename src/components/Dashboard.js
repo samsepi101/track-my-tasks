@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import Loading from './Loading'; // 👈 Import your custom Loading component
+import Loading from './Loading';
 import '../App.css';
 
 export default function Dashboard() {
@@ -156,7 +156,7 @@ export default function Dashboard() {
 
     // Loading screen
     if (isLoading) {
-        return <Loading />; // 👈 Your custom loading spinner
+        return <Loading />;
     }
 
     return (
@@ -168,7 +168,7 @@ export default function Dashboard() {
                         onClick={() => navigate("/admin")}
                         className="btn btn-secondary btn-block mt-5"
                     >
-                        🔐 Go to Admin Panel
+                        Admin Panel
                     </button>
                 )}
 
