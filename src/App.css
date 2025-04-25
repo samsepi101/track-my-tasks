@@ -1,0 +1,22 @@
+.main-heading {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 550; 
+    font-size: 3rem;  
+    text-align: center;
+    color: #333; 
+}
+
+@keyframes spinner-line-fade-default {
+    0%, 39%, 100% {
+      opacity: 0.25;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
+
+  .spinner {
+    width: 100px;
+    height: 100px;
+    position: relative;
+  }
