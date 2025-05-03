@@ -3,35 +3,42 @@
 /* Header background color */
 .header-background {
     background-color: black;
+    position: relative;
+    z-index: 5; /* keep header above background but below scroll text */
 }
+
+/* dashboard.css */
 
 /* Scroll text container */
 .scroll-text-container {
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
     background-color: #e0e0e0;
     color: black;
-    padding: 10px;
-    font-size: 1.2rem;
+    padding: 0 10px;
+    height: 2rem;                /* adjust as needed for your font-size */
+    display: flex;               
+    align-items: center;         /* vertical centering */
     margin-bottom: 20px;
+    z-index: 10;
 }
 
 /* Scroll text animation */
 .scroll-text {
     position: absolute;
     white-space: nowrap;
+    top: 50%;
+    transform: translateY(-50%); /* perfect vertical centering */
     animation: scroll-text 10s linear infinite;
+    z-index: 11;
 }
 
 /* Animation for scrolling text */
 @keyframes scroll-text {
-    0% {
-        transform: translateX(100%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
+    0%   { transform: translateY(-50%) translateX(100%); }
+    100% { transform: translateY(-50%) translateX(-100%); }
 }
+
 
 /* Task card hover effect */
 .task-card .card {
@@ -43,7 +50,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Optional: Additional task card styles */
+/* Additional task card styles */
 .task-card .card-body {
     padding: 20px;
 }

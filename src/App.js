@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import AdminPanel from "./components/AdminPanel";
 import { requestForToken } from "./firebase";
+import AccountPage from './components/AccountPage';
 
 function App() {
   useEffect(() => {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/account" element={<AccountPage />} />
         <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </Router>

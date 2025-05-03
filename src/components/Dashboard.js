@@ -14,12 +14,13 @@ import {
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Loading from './Loading';
-import './Dashboard.css'; // Import the CSS file
+import './Dashboard.css';
 
 export default function Dashboard() {
     const [task, setTask] = useState({ title: "", description: "", deadline: "" });
     const [tasks, setTasks] = useState([]);
     const [user, setUser] = useState(null);
+    const [userName, setUserName] = useState("");
     const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -44,6 +45,7 @@ export default function Dashboard() {
                 navigate("/");
             } else {
                 setUser(currentUser);
+                await fetchUserName(currentUser.uid);
 
                 const q = query(collection(db, "tasks"), where("userId", "==", currentUser.uid));
                 const unsubscribeTasks = onSnapshot(q, (querySnapshot) => {
@@ -78,6 +80,14 @@ export default function Dashboard() {
 
         return () => unsubscribe();
     }, [navigate]);
+
+    const fetchUserName = async (uid) => {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            setUserName(userSnap.data().name || "");
+        }
+    };
 
     const checkIfAdmin = async (uid) => {
         const userRef = doc(db, "users", uid);
@@ -154,14 +164,13 @@ export default function Dashboard() {
         task.title.toLowerCase().startsWith(searchQuery.toLowerCase())
     );
 
-    // Loading screen
     if (isLoading) {
         return <Loading />;
     }
 
     return (
         <div className="container-fluid bg-light p-0 m-0">
-            <h2 className="text-center mb-4 main-heading text-white header-background">Task Tracker</h2>
+            <h2 className="text-center main-heading text-white header-background m-0">Task Tracker</h2>
 
             <div className="scroll-text-container">
                 <div className="scroll-text">
@@ -169,25 +178,37 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            <div className="d-flex justify-content-between align-items-center flex-wrap px-4 mt-4">
+    {isAdmin && (
+        <button
+            onClick={() => navigate("/admin")}
+            className="btn btn-secondary"
+        >
+            Admin Panel
+        </button>
+    )}
 
-            <div className="d-flex flex-row justify-content-between px-4">
-                {isAdmin && (
-                    <button
-                        onClick={() => navigate("/admin")}
-                        className="btn btn-secondary btn-block mt-5"
-                    >
-                        Admin Panel
-                    </button>
-                )}
+    <div className="d-flex align-items-center gap-3">
+        {/* Account Name */}
+        <div
+            className="text-primary text-decoration-underline"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/account")}
+        >
+            {userName}
+        </div>
 
-                {/* Logout */}
-                <button
-                    onClick={() => signOut(auth)}
-                    className="btn btn-danger btn-block mt-5"
-                >
-                    Logout
-                </button>
-            </div>
+        {/* Logout */}
+        <button
+            onClick={() => signOut(auth)}
+            className="btn btn-danger"
+        >
+            Logout
+        </button>
+    </div>
+</div>
+
+
             {/* Add Task Form */}
             <h3 className="text-center mb-4">Add a Task</h3>
             <div className="d-flex justify-content-center">
@@ -222,6 +243,7 @@ export default function Dashboard() {
                     </div>
                 </form>
             </div>
+
             <div className="container-fluid px-5">
                 <h3>Your Tasks</h3>
 
@@ -273,13 +295,13 @@ export default function Dashboard() {
                                                 className="btn btn-outline-info btn-sm ms-2"
                                                 onClick={() => openEditModal(task)}
                                             >
-                                                ✏️ Edit
+                                                Edit
                                             </button>
                                             <button
                                                 className="btn btn-outline-danger btn-sm ms-2"
                                                 onClick={() => handleDelete(task.id)}
                                             >
-                                                ❌ Delete
+                                                Delete
                                             </button>
                                         </div>
                                     </div>
@@ -350,7 +372,6 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
-                        {/* Modal Backdrop */}
                         <div className="modal-backdrop fade show" onClick={() => setEditTask(null)}></div>
                     </>
                 )}
