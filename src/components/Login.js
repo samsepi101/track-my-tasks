@@ -6,11 +6,13 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import Loading from './Loading'; // 👈 Import your custom Loading component
+import Loading from './Loading';
+import './Login.css';
 
 export default function Login() {
     const [isRegistering, setIsRegistering] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showArrow, setShowArrow] = useState(false);
     const [form, setForm] = useState({
         email: "",
         password: "",
@@ -30,6 +32,9 @@ export default function Login() {
         });
         return () => unsubscribe();
     }, [navigate]);
+
+
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -66,6 +71,7 @@ export default function Login() {
         e.preventDefault();
         setIsLoading(true);
         setError(null); // Reset error message
+        setShowArrow(false);
 
         // Validate the form
         const validationError = validateForm();
@@ -99,18 +105,35 @@ export default function Login() {
                 navigate("/dashboard");
             }, 500);
         } catch (error) {
-            setError("Error: " + error.message);
+            console.log(error);  // Log the entire error object to check the structure
             setIsLoading(false);
+
+            if (error.code === "auth/user-not-found") {
+                setShowArrow(true);  // This should trigger the arrow
+                setError("Account does not exist. Please register first.");
+            } else if (error.code === "auth/invalid-credential") {
+                setShowArrow(true);  // This should trigger the arrow
+                setError("Account does not exist. Please register first");
+            }
+            else if (error.code === "auth/network-request-failed") {
+                setShowArrow(true);  // This should trigger the arrow
+                setError("Please check your network and try again");
+            }
+            else {
+                setError("Error: " + error.message);
+            }
         }
     };
 
     if (isLoading) {
-        return <Loading />; // 👈 Your custom loading spinner
+        return <Loading />;
     }
 
+
     return (
-        <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-            <div className="card w-100 w-md-50 shadow-lg">
+        <div className="d-flex flex-column justify-content-center align-items-center min-vh-100 bg-light">
+            <div className="card mx-auto w-50 w-md-50 rounded-4 shadow-lg position-relative">
+
                 <div className="card-body">
                     <h2 className="text-center mb-4">
                         {isRegistering ? "Register" : "Login"}
@@ -194,13 +217,25 @@ export default function Login() {
                         >
                             {isRegistering ? "Register" : "Login"}
                         </button>
+
+                        {showArrow && (
+                            <img
+                                src="/assets/arrows.svg"
+                                alt="Arrow"
+                                className="arrow-img"
+                            />
+                        )}
                     </form>
 
                     <p className="mt-3 text-center text-muted">
                         {isRegistering ? "Already have an account?" : "Don't have an account?"}{" "}
                         <button
                             type="button"
-                            onClick={() => setIsRegistering(!isRegistering)}
+                            onClick={() => {
+                                setIsRegistering(!isRegistering);
+                                setError(null);         // Clear error immediately
+                                setShowArrow(false);    // Hide arrow immediately
+                            }}
                             className="btn btn-link text-primary"
                         >
                             {isRegistering ? "Login" : "Register"}

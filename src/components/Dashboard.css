@@ -1,0 +1,49 @@
+/* dashboard.css */
+
+/* Header background color */
+.header-background {
+    background-color: black;
+}
+
+/* Scroll text container */
+.scroll-text-container {
+    overflow: hidden;
+    position: relative;
+    background-color: #e0e0e0;
+    color: black;
+    padding: 10px;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Scroll text animation */
+.scroll-text {
+    position: absolute;
+    white-space: nowrap;
+    animation: scroll-text 10s linear infinite;
+}
+
+/* Animation for scrolling text */
+@keyframes scroll-text {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Task card hover effect */
+.task-card .card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.task-card .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: Additional task card styles */
+.task-card .card-body {
+    padding: 20px;
+}

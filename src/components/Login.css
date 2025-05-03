@@ -1,0 +1,21 @@
+.arrow-img {
+    position: absolute;
+    transform: translate(-325%,140%) rotate(180deg);
+    width: 75px; /* Scale arrow size */
+    animation: fadeIn 0.5s ease-in-out;
+    pointer-events: none;
+  }
+  
+.circle-img {
+    position: absolute;
+    transform: translate(-270%,179%) rotate(-2deg); 
+    width: 94px; /* Scale arrow size */
+    animation: fadeIn 0.5s ease-in-out;
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  

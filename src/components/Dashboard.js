@@ -14,7 +14,7 @@ import {
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Loading from './Loading';
-import '../App.css';
+import './Dashboard.css'; // Import the CSS file
 
 export default function Dashboard() {
     const [task, setTask] = useState({ title: "", description: "", deadline: "" });
@@ -160,9 +160,17 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="container mt-6">
-            <h2 className="text-center mb-4 main-heading">Task Tracker</h2>
-            <div className="d-flex flex-row justify-content-between">
+        <div className="container-fluid bg-light p-0 m-0">
+            <h2 className="text-center mb-4 main-heading text-white header-background">Task Tracker</h2>
+
+            <div className="scroll-text-container">
+                <div className="scroll-text">
+                    "The future depends on what we do in the present." – Mahatma Gandhi
+                </div>
+            </div>
+
+
+            <div className="d-flex flex-row justify-content-between px-4">
                 {isAdmin && (
                     <button
                         onClick={() => navigate("/admin")}
@@ -214,135 +222,139 @@ export default function Dashboard() {
                     </div>
                 </form>
             </div>
+            <div className="container-fluid px-5">
+                <h3>Your Tasks</h3>
 
-            <h3>Your Tasks</h3>
+                {/* Search */}
+                <input
+                    type="text"
+                    className="form-control mb-4"
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
 
-            {/* Search */}
-            <input
-                type="text"
-                className="form-control mb-4"
-                placeholder="Search tasks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-            />
-
-            {/* Task List */}
-            <div className="row">
-                {filteredTasks.length > 0 ? (
-                    filteredTasks.map((task) => (
-                        <div key={task.id} className="col-sm-12 col-md-6 col-lg-4 mb-4">
-                            <div className="card shadow-sm">
-                                <div className="card-body">
-                                    <h5 className="card-title">{task.title}</h5>
-                                    <p><strong>Description:</strong> {task.description}</p>
-                                    <p><strong>Deadline:</strong> {task.deadline}</p>
-                                    <p>
-                                        <strong>Status:</strong>{" "}
-                                        <span
-                                            className={
-                                                task.completed
-                                                    ? "text-success"
+                {/* Task List */}
+                <div className="row">
+                    {filteredTasks.length > 0 ? (
+                        filteredTasks.map((task) => (
+                            <div key={task.id} className="col-sm-12 col-md-6 col-lg-4 mb-4 task-card">
+                                <div className="card shadow-sm">
+                                    <div className="card-body">
+                                        <h5 className="card-title">{task.title}</h5>
+                                        <p><strong>Description:</strong> {task.description}</p>
+                                        <p><strong>Deadline:</strong> {task.deadline}</p>
+                                        <p>
+                                            <strong>Status:</strong>{" "}
+                                            <span
+                                                className={
+                                                    task.completed
+                                                        ? "text-success"
+                                                        : isTaskOverdue(task)
+                                                            ? "text-danger"
+                                                            : "text-warning"
+                                                }
+                                            >
+                                                {task.completed
+                                                    ? "✅ Completed"
                                                     : isTaskOverdue(task)
-                                                        ? "text-danger"
-                                                        : "text-warning"
-                                            }
-                                        >
-                                            {task.completed
-                                                ? "✅ Completed"
-                                                : isTaskOverdue(task)
-                                                    ? "❗ Overdue"
-                                                    : "⏳ Incomplete"}
-                                        </span>
-                                    </p>
-                                    <div className="d-flex justify-content-end mt-3">
+                                                        ? "❗ Overdue"
+                                                        : "⏳ Incomplete"}
+                                            </span>
+                                        </p>
+                                        <div className="d-flex justify-content-end mt-3">
+                                            <button
+                                                className="btn btn-outline-success btn-sm"
+                                                onClick={() => toggleComplete(task.id, task.completed)}
+                                            >
+                                                {task.completed ? "Undo" : "Complete"}
+                                            </button>
+                                            <button
+                                                className="btn btn-outline-info btn-sm ms-2"
+                                                onClick={() => openEditModal(task)}
+                                            >
+                                                ✏️ Edit
+                                            </button>
+                                            <button
+                                                className="btn btn-outline-danger btn-sm ms-2"
+                                                onClick={() => handleDelete(task.id)}
+                                            >
+                                                ❌ Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-12 text-center text-muted">
+                            <h5>🔍 No tasks match your search.</h5>
+                        </div>
+                    )}
+                </div>
+
+                {editTask && (
+                    <>
+                        {/* Modal */}
+                        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+                            <div className="modal-dialog" role="document">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Edit Task</h5>
                                         <button
-                                            className="btn btn-outline-success btn-sm"
-                                            onClick={() => toggleComplete(task.id, task.completed)}
+                                            type="button"
+                                            className="btn-close"
+                                            onClick={() => setEditTask(null)}
+                                        />
+                                    </div>
+                                    <div className="modal-body">
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            value={editedData.title}
+                                            onChange={handleEditChange}
+                                            placeholder="Title"
+                                            className="form-control mb-3"
+                                        />
+                                        <textarea
+                                            name="description"
+                                            value={editedData.description}
+                                            onChange={handleEditChange}
+                                            placeholder="Description"
+                                            className="form-control mb-3"
+                                        />
+                                        <input
+                                            type="date"
+                                            name="deadline"
+                                            value={editedData.deadline}
+                                            onChange={handleEditChange}
+                                            className="form-control mb-3"
+                                        />
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            onClick={() => setEditTask(null)}
                                         >
-                                            {task.completed ? "Undo" : "Complete"}
+                                            Cancel
                                         </button>
                                         <button
-                                            className="btn btn-outline-info btn-sm ms-2"
-                                            onClick={() => openEditModal(task)}
+                                            type="button"
+                                            className="btn btn-success"
+                                            onClick={saveEdit}
                                         >
-                                            ✏️ Edit
-                                        </button>
-                                        <button
-                                            className="btn btn-outline-danger btn-sm ms-2"
-                                            onClick={() => handleDelete(task.id)}
-                                        >
-                                            ❌ Delete
+                                            Save Changes
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    ))
-                ) : (
-                    <div className="col-12 text-center text-muted">
-                        <h5>🔍 No tasks match your search.</h5>
-                    </div>
+                        {/* Modal Backdrop */}
+                        <div className="modal-backdrop fade show" onClick={() => setEditTask(null)}></div>
+                    </>
                 )}
             </div>
-
-            {/* Edit Modal */}
-            {editTask && (
-                <div className="modal fade show d-block" tabIndex="-1" role="dialog">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Edit Task</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setEditTask(null)}
-                                />
-                            </div>
-                            <div className="modal-body">
-                                <input
-                                    type="text"
-                                    name="title"
-                                    value={editedData.title}
-                                    onChange={handleEditChange}
-                                    placeholder="Title"
-                                    className="form-control mb-3"
-                                />
-                                <textarea
-                                    name="description"
-                                    value={editedData.description}
-                                    onChange={handleEditChange}
-                                    placeholder="Description"
-                                    className="form-control mb-3"
-                                />
-                                <input
-                                    type="date"
-                                    name="deadline"
-                                    value={editedData.deadline}
-                                    onChange={handleEditChange}
-                                    className="form-control mb-3"
-                                />
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => setEditTask(null)}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-success"
-                                    onClick={saveEdit}
-                                >
-                                    Save Changes
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-backdrop fade show"></div>
-                </div>
-            )}
         </div>
     );
 }
